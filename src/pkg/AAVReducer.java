@@ -13,7 +13,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 
-public class AAVReducer extends Reducer<Text,Text,Text,Text>
+public class AAVReducer extends Reducer<AuthGram,Text,Text,Text>
 {
 	private MultipleOutputs<Text, Text> output;
 	private static boolean singleAuthor;
@@ -50,22 +50,22 @@ public class AAVReducer extends Reducer<Text,Text,Text,Text>
         output.close();
     }
 
-	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException 
+	public void reduce(AuthGram key, Iterable<Text> values, Context context) throws IOException, InterruptedException 
 	{		
 		/*
 		 * Ug. Turns out values ARE NOT sorted in hadoop M/R. 
 		 * I could do a secondary sort, but this is much easier.
-		 */
+		 *
 		ArrayList<Text> vals = new ArrayList<Text>();
 		for(Text val: values)
 			vals.add(new Text(val));
 		Collections.sort(vals);
-		
+		*/
 		
 		String aav = "";
 		int outsideWords = 0;
 		
-		Iterator<Text> words = vals.iterator();
+		Iterator<Text> words = values.iterator();
 		String[] val = words.next().toString().split(",");
 		for(IdfWord idfWord: idfWords)
 		{		
@@ -106,9 +106,9 @@ public class AAVReducer extends Reducer<Text,Text,Text,Text>
 		}
 		
 		aav += String.valueOf(outsideWords);
-		String fileName = key.toString();
+		String fileName = key.getAuth().toString();
 		if(singleAuthor)
 			fileName = "AAV";
-		output.write("AAV", key, new Text(aav), "AAV/" + fileName);
+		output.write("AAV", key.getAuth(), new Text(aav), fileName);
 	}
 }

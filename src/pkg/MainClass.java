@@ -20,9 +20,6 @@ public class MainClass {
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException 
 	{
-		FileSystem hdfs =FileSystem.get(new Configuration()); 
-	    
-	   
 		if (args.length != 2 && args.length != 3 ) 
 		{
 				System.out.printf("Usage to build corpus: <jar file> <input dir> <output dir>\n"
@@ -101,9 +98,11 @@ public class MainClass {
 		aavJob.setJarByClass(MainClass.class);
 		aavJob.setMapperClass(AAVMapper.class);
 		aavJob.setReducerClass(AAVReducer.class);
-		aavJob.setOutputKeyClass(Text.class);
+		aavJob.setOutputKeyClass(AuthGram.class);
 		aavJob.setOutputValueClass(Text.class);
 		aavJob.setInputFormatClass(TextInputFormat.class);
+		aavJob.setGroupingComparatorClass(AuthGramGroupingComparator.class);
+		aavJob.setPartitionerClass(AuthGramPartitioner.class);
 
 		aavJob.setOutputFormatClass(TextOutputFormat.class);
 		//FileOutputFormat.

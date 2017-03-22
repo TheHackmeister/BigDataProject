@@ -6,7 +6,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class AAVMapper extends Mapper<LongWritable, Text, Text, Text>
+public class AAVMapper extends Mapper<LongWritable, Text, AuthGram, Text>
 {	
 	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException
 	{
@@ -21,6 +21,6 @@ public class AAVMapper extends Mapper<LongWritable, Text, Text, Text>
 		String gram = lineMatcher.group(2);
 		String tf = lineMatcher.group(3);
 		
-		context.write(new Text(author), new Text(gram + "," + tf));
+		context.write(new AuthGram(author, gram), new Text(gram + "," + tf));
 	}
 }
