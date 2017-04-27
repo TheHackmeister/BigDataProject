@@ -59,6 +59,10 @@ public class TheMapper extends Mapper<LongWritable, Text, Text, Text>
 	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException
 	{
 		
+		// Data structure: 
+		// [0]MatchId, [1]Match Version, [2]Region, [3]Match Type, [4]Season, [5]Queue Type, 
+		// [6]Bans, [7]Team 1 champs, [8]Team -1 champs, [9]Team 1 spells, [10]Team -1 spells, [11]Winner.
+		
 		String features = "F";
 		String reducer = "R";
 		
