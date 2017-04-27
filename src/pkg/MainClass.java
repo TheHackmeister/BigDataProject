@@ -15,7 +15,7 @@ public class MainClass
 	{	
 		if (args.length != 3 ) 
 		{
-				System.out.printf("Usage to calculate RMSE: <jar file> <input dir> <theata dir> <alpha>\n");
+				System.out.printf("Usage to calculate RMSE: <jar file> <input dir> <theta dir> <alpha>\n");
 				System.exit(-1);
 		}
 		
