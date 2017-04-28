@@ -41,12 +41,12 @@ public class TheMapper extends Mapper<LongWritable, Text, Text, Text>
 		
 		for(String cId: inputTeam1.split(":"))
 		{
-			array.set(entryMap.get(cId), entryMap.get(cId)+1);
+			array.set(entryMap.get(cId), array.get(entryMap.get(cId)) + 1);
 		}
 
 		for(String cId: inputTeam2.split(":"))
 		{
-			array.set(entryMap.get(cId), entryMap.get(cId)-1);
+			array.set(entryMap.get(cId), array.get(entryMap.get(cId)) - 1);
 		}
 		
 		String s = "";
