@@ -1,17 +1,10 @@
 package pkg;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
 
 public class TheMapper extends Mapper<LongWritable, Text, Text, Text>
 {	
@@ -63,11 +56,9 @@ public class TheMapper extends Mapper<LongWritable, Text, Text, Text>
 		// [0]MatchId, [1]Match Version, [2]Region, [3]Match Type, [4]Season, [5]Queue Type, [6] Unimportant, 
 		// [7]Bans, [8]Team 1 champs, [9]Team -1 champs, [10]Team 1 spells, [11]Team -1 spells, [12]Winner.
 		
-		String features = "F";
-		String reducer = "R";
+		String features = "";
 		
 		// Split input into something real.
-		
 		String[] line = value.toString().split(",");
 		if(Integer.parseInt(line[13]) < 101)
 			features = "1,";
@@ -86,15 +77,5 @@ public class TheMapper extends Mapper<LongWritable, Text, Text, Text>
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException 
 	{
-		ArrayList<Integer> a = new ArrayList<Integer>();
-		a.add(1);
-		a.add(2);
-		System.out.println(a.toString());
-		for(Integer i: a)
-		{
-			i = 5;
-		}
-		System.out.println(a.toString());
-
 	}	
 }

@@ -53,13 +53,13 @@ public class MainClass
 				if (job.waitForCompletion(true))
 				{
 					FileSystem fs = FileSystem.get(new Configuration());
-					fs.delete(new Path("/thetaBackup"));
+					fs.delete(new Path("/thetaBackup"), true);
 					fs.rename(new Path(thetaLocation), new Path("/thetaBackup"));
 					fs.rename(new Path(tempLocation), new Path(thetaLocation));
 					
 				} else {
 					FileSystem fs = FileSystem.get(new Configuration());
-					fs.delete(new Path(tempLocation + "old"));
+					fs.delete(new Path(tempLocation + "old"), true);
 					fs.rename(new Path(tempLocation), new Path(tempLocation + "old"));
 					System.exit(1);
 				}
