@@ -16,6 +16,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 public class TheMapper extends Mapper<LongWritable, Text, Text, Text>
 {	
 	static HashMap<String,Integer> champions = new HashMap<String,Integer>();
+	static HashMap<String,Integer> spells = new HashMap<String,Integer>();
 	@Override
 	protected void setup( Mapper<LongWritable, Text, Text, Text>.Context context) throws IOException, InterruptedException {
 	    if ( champions.size() == 0) 
@@ -26,30 +27,38 @@ public class TheMapper extends Mapper<LongWritable, Text, Text, Text>
 				champions.put(champ.split("\\.")[1], Integer.parseInt(champ.split("\\.")[0]));
 			}
 	    }
+	    if ( spells.size() == 0)
+	      {
+	    	String summonerSpells = "0.34.SummonerSiegeChampSelect2;1.12.SummonerTeleport;2.33.SummonerSiegeChampSelect1;3.3.SummonerExhaust;4.21.SummonerBarrier;5.11.SummonerSmite;6.4.SummonerFlash;7.14.SummonerDot;8.13.SummonerMana;9.32.SummonerSnowball;10.30.SummonerPoroRecall;11.6.SummonerHaste;12.7.SummonerHeal;13.31.SummonerPoroThrow;14.1.SummonerBoost;";
+	    	for(String summonerSpell: summonerSpells.split(";"))
+			{
+				spells.put(summonerSpell.split("\\.")[1], Integer.parseInt(summonerSpell.split("\\.")[0]));
+			}
+	      }
 	    super.setup(context);
 	}
 	
 	
-	private String champsToString(String goodTeam, String badTeam)
+	private String featuresToString(HashMap<String, Integer> entryMap, String inputTeam1, String inputTeam2)
 	{	
-		ArrayList<String> array = new ArrayList<String>();
+		ArrayList<Integer> array = new ArrayList<Integer>();
 		for(int i = 0; i < 136; i++) 
 		{
-			array.add("0");
+			array.add(0);
 		}
 		
-		for(String cId: goodTeam.split(":"))
+		for(String cId: inputTeam1.split(":"))
 		{
-			array.set(champions.get(cId), "1");
+			array.set(entryMap.get(cId), entryMap.get(cId)+1);
 		}
 
-		for(String cId: badTeam.split(":"))
+		for(String cId: inputTeam2.split(":"))
 		{
-			array.set(champions.get(cId), "-1");
+			array.set(entryMap.get(cId), entryMap.get(cId)-1);
 		}
 		
 		String s = "";
-		for(String champ: array)
+		for(Integer champ: array)
 		{
 			s += champ + ",";
 		}
@@ -64,7 +73,7 @@ public class TheMapper extends Mapper<LongWritable, Text, Text, Text>
 		// [7]Bans, [8]Team 1 champs, [9]Team -1 champs, [10]Team 1 spells, [11]Team -1 spells, [12]Winner.
 		
 		String features = "F";
-		String reducer = "R";
+		//String reducer = "R";
 		
 		// Split input into something real.
 		
@@ -76,7 +85,8 @@ public class TheMapper extends Mapper<LongWritable, Text, Text, Text>
 		
 		//features += line[3] + ",";
 		
-		features += champsToString(line[8], line[9]);
+		features += featuresToString(champions, line[8], line[9]);
+		features += featuresToString(spells, line[10], line[11]);
 		//features += line[7];
 		
 		// Taking the last value of the match ID as the key. This way it splits it into 10 about even splits. 
