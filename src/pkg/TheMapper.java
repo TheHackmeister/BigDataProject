@@ -30,7 +30,7 @@ public class TheMapper extends Mapper<LongWritable, Text, Text, Text>
 	}
 	
 	
-	private String champsToString(String goodTeam, String badTeam)
+	protected String champsToString(String goodTeam, String badTeam)
 	{	
 		ArrayList<String> array = new ArrayList<String>();
 		for(int i = 0; i < 136; i++) 
@@ -69,7 +69,7 @@ public class TheMapper extends Mapper<LongWritable, Text, Text, Text>
 		// Split input into something real.
 		
 		String[] line = value.toString().split(",");
-		if(line[11] == "100")
+		if(Integer.parseInt(line[13]) < 101)
 			features = "1,";
 		else 
 			features = "-1,";
@@ -83,8 +83,18 @@ public class TheMapper extends Mapper<LongWritable, Text, Text, Text>
 		//context.write(new Text(line[0].substring(line[0].length() - 1)),  new Text(features));
 		context.write(new Text("One"),  new Text(features.substring(0, features.length() -1)));
 	}
+
 	public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException 
 	{
+		ArrayList<Integer> a = new ArrayList<Integer>();
+		a.add(1);
+		a.add(2);
+		System.out.println(a.toString());
+		for(Integer i: a)
+		{
+			i = 5;
+		}
+		System.out.println(a.toString());
 
 	}	
 }
