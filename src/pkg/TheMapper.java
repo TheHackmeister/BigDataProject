@@ -21,8 +21,7 @@ public class TheMapper extends Mapper<LongWritable, Text, Text, Text>
 	    }
 	    super.setup(context);
 	}
-	
-	
+		
 	protected String champsToString(String goodTeam, String badTeam)
 	{	
 		ArrayList<String> array = new ArrayList<String>();
@@ -49,30 +48,28 @@ public class TheMapper extends Mapper<LongWritable, Text, Text, Text>
 		return s;
 	}
 	
+	// Data structure: 
+	// [0]MatchId, [1]Match Version, [2]Region, [3/4]Match Type/Something?, [5]Season, [6]Queue Type, [7] Unimportant, 
+	// [8]Bans, [9]Team 1 champs, [10]Team -1 champs, [11]Team 1 spells, [12]Team -1 spells, [13]Winner.
+	protected String translateLine(Text value)
+	{
+		String[] line = value.toString().split(",");
+		String s = "";
+		
+		if(Integer.parseInt(line[13]) < 101)
+			s = "1,";
+		else 
+			s = "-1,";
+		
+		s += champsToString(line[8], line[9]);
+		
+		// Assume trailing ","
+		return s.substring(0, s.length() -1);
+	}
+	
 	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException
 	{
-		
-		// Data structure: 
-		// [0]MatchId, [1]Match Version, [2]Region, [3]Match Type, [4]Season, [5]Queue Type, [6] Unimportant, 
-		// [7]Bans, [8]Team 1 champs, [9]Team -1 champs, [10]Team 1 spells, [11]Team -1 spells, [12]Winner.
-		
-		String features = "";
-		
-		// Split input into something real.
-		String[] line = value.toString().split(",");
-		if(Integer.parseInt(line[13]) < 101)
-			features = "1,";
-		else 
-			features = "-1,";
-		
-		//features += line[3] + ",";
-		
-		features += champsToString(line[8], line[9]);
-		//features += line[7];
-		
-		// Taking the last value of the match ID as the key. This way it splits it into 10 about even splits. 
-		//context.write(new Text(line[0].substring(line[0].length() - 1)),  new Text(features));
-		context.write(new Text("One"),  new Text(features.substring(0, features.length() -1)));
+		context.write(new Text("One"),  new Text(translateLine(value)));
 	}
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException 
