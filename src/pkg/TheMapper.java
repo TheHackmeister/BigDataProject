@@ -69,8 +69,8 @@ public class TheMapper extends Mapper<LongWritable, Text, Text, Text>
 			s = "1,";
 		else 
 			s = "-1,";
-		s += featuresToString(champions, line[8], line[9]);
-		//s += featuresToString(spells, line[10], line[11]);
+		s += featuresToString(champions, line[9], line[10]);
+		s += featuresToString(spells, line[11], line[12]);
 		
 		// Assume trailing ","
 		return s.substring(0, s.length() -1);
