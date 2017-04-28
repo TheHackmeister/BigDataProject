@@ -1,17 +1,10 @@
 package pkg;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
 
 public class TheMapper extends Mapper<LongWritable, Text, Text, Text>
 {	
@@ -28,21 +21,20 @@ public class TheMapper extends Mapper<LongWritable, Text, Text, Text>
 			}
 	    }
 	    if ( spells.size() == 0)
-	      {
+	    {
 	    	String summonerSpells = "0.34.SummonerSiegeChampSelect2;1.12.SummonerTeleport;2.33.SummonerSiegeChampSelect1;3.3.SummonerExhaust;4.21.SummonerBarrier;5.11.SummonerSmite;6.4.SummonerFlash;7.14.SummonerDot;8.13.SummonerMana;9.32.SummonerSnowball;10.30.SummonerPoroRecall;11.6.SummonerHaste;12.7.SummonerHeal;13.31.SummonerPoroThrow;14.1.SummonerBoost;";
 	    	for(String summonerSpell: summonerSpells.split(";"))
 			{
 				spells.put(summonerSpell.split("\\.")[1], Integer.parseInt(summonerSpell.split("\\.")[0]));
 			}
-	      }
+	    }
 	    super.setup(context);
 	}
-	
 	
 	private String featuresToString(HashMap<String, Integer> entryMap, String inputTeam1, String inputTeam2)
 	{	
 		ArrayList<Integer> array = new ArrayList<Integer>();
-		for(int i = 0; i < 136; i++) 
+		for(int i = 0; i < entryMap.size(); i++) 
 		{
 			array.add(0);
 		}
@@ -65,36 +57,31 @@ public class TheMapper extends Mapper<LongWritable, Text, Text, Text>
 		return s;
 	}
 	
+	// Data structure: 
+	// [0]MatchId, [1]Match Version, [2]Region, [3/4]Match Type/Something?, [5]Season, [6]Queue Type, [7] Unimportant, 
+	// [8]Bans, [9]Team 1 champs, [10]Team -1 champs, [11]Team 1 spells, [12]Team -1 spells, [13]Winner.
+	protected String translateLine(Text value)
+	{
+		String[] line = value.toString().split(",");
+		String s = "";
+		
+		if(Integer.parseInt(line[13]) < 101)
+			s = "1,";
+		else 
+			s = "-1,";
+		s += featuresToString(champions, line[8], line[9]);
+		//s += featuresToString(spells, line[10], line[11]);
+		
+		// Assume trailing ","
+		return s.substring(0, s.length() -1);
+	}
+	
 	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException
 	{
-		
-		// Data structure: 
-		// [0]MatchId, [1]Match Version, [2]Region, [3]Match Type, [4]Season, [5]Queue Type, [6] Unimportant, 
-		// [7]Bans, [8]Team 1 champs, [9]Team -1 champs, [10]Team 1 spells, [11]Team -1 spells, [12]Winner.
-		
-		String features = "F";
-		//String reducer = "R";
-		
-		// Split input into something real.
-		
-		String[] line = value.toString().split(",");
-		if(line[11] == "100")
-			features = "1,";
-		else 
-			features = "-1,";
-		
-		//features += line[3] + ",";
-		
-		features += featuresToString(champions, line[8], line[9]);
-		features += featuresToString(spells, line[10], line[11]);
-		//features += line[7];
-		
-		// Taking the last value of the match ID as the key. This way it splits it into 10 about even splits. 
-		//context.write(new Text(line[0].substring(line[0].length() - 1)),  new Text(features));
-		context.write(new Text("One"),  new Text(features.substring(0, features.length() -1)));
+		context.write(new Text("One"),  new Text(translateLine(value)));
 	}
+
 	public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException 
 	{
-
 	}	
 }
